@@ -2,12 +2,21 @@
 set ipaddr [lindex $argv 0];
 set usr_name [lindex $argv 1];
 set usr_pwd  [lindex $argv 2];
+set port  [lindex $argv 3];
+set timeout -1
 
 
-spawn scp -F ./ssh_config_now /Users/gaobo/.ssh/id_rsa.pub $usr_name@$ipaddr:~
+send  "$usr_pwd\n"
+send  "$usr_name\n"
+send  "$ipaddr \n"
+sleep 1
+spawn scp -F ./ssh_config_now  -P $port /home/jsxgblcxp/.ssh/id_rsa.pub $usr_name@$ipaddr:~
 
 expect "yes" { 
         send "yes\n"
+        expect "pass"
+        send $usr_pwd;
+        send "\n";
 } "pass" { 
         send $usr_pwd;
         send "\n";
@@ -15,10 +24,13 @@ expect "yes" {
 
 sleep 1
 
-spawn ssh -F ./ssh_config_now $usr_name@$ipaddr
+spawn ssh -F ./ssh_config_now -p $port $usr_name@$ipaddr
 
 expect "yes" { 
         send "yes\n"
+        expect "pass"
+        send $usr_pwd;
+        send "\n";
 } "pass" { 
         send $usr_pwd;
         send "\n";
